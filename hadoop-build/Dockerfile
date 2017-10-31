@@ -35,6 +35,7 @@ RUN tar -xzvf hadoop-$VERSION-src.tar.gz
 # compile hadoop
 RUN cd hadoop-$VERSION-src && \
     mvn package -Pdist,native -DskipTests -Dtar && \
+    cd .. && \
     tar -xzvf hadoop-$VERSION-src/hadoop-dist/target/hadoop-$VERSION.tar.gz
 
 # move compiled hadoop to binary directory

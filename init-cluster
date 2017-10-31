@@ -7,8 +7,8 @@ NODES=${1:-3}
 VERSION=${2:-2.7.2}
 
 if [[ "$(docker images -q $(whoami)/hadoop:$VERSION 2> /dev/null)" == "" ]]; then
-  # do something
-  echo -e "docker image not found!\nbuild a new one...\n"
+  # create new docker image
+  echo -e "$(whoami)/hadoop:$VERSION docker image not found!\n"
   cd hadoop-build
   ./build $NODES $VERSION
   cd ..
@@ -37,7 +37,7 @@ do
 	                --hostname hadoop-slave$i \
 	                $(whoami)/hadoop:$VERSION
 	i=$(( $i + 1 ))
-done 
+done
 
 # start hadoop inside container
 docker exec -it hadoop-master /root/start-hadoop.sh
