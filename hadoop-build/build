@@ -7,7 +7,9 @@ NODES=${1:-3}
 VERSION=${2:-2.7.2}
 
 # clean old slaves configuration
-rm config/slaves
+if [ -f config/slaves]; then
+    rm config/slaves
+fi
 
 # create dynamic slaves file based on NODES number
 i=1
@@ -15,7 +17,7 @@ while [ $i -lt $NODES ]
 do
 	echo "hadoop-slave$i" >> config/slaves
 	((i++))
-done 
+done
 
 # print status
 echo -e "building docker image for a cluster of $NODES nodes with hadoop-$VERSION\n"
