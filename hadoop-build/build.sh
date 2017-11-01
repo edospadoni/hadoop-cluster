@@ -3,8 +3,8 @@
 # get number of cluster nodes
 NODES=${1:-3}
 
-# get version of hadoop or fallback to 2.7.2
-VERSION=${2:-2.7.2}
+# get version of hadoop or fallback to 2.8.2
+VERSION=${2:-2.8.2}
 
 # clean old slaves configuration
 if [ -f config/slaves ]; then

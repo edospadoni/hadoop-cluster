@@ -3,15 +3,47 @@
 # get number of cluster nodes
 NODES=${1:-3}
 
-# get version of hadoop or fallback to 2.7.2
-VERSION=${2:-2.7.2}
+# check previous nodes number of cluster
+if [[ -f nodes ]]; then
+  CURRENT_NODES=$(cat nodes)
+fi
 
-if [[ "$(docker images -q $(whoami)/hadoop:$VERSION 2> /dev/null)" == "" ]]; then
-  # create new docker image
-  echo -e "$(whoami)/hadoop:$VERSION docker image not found!\n"
-  cd hadoop-build
-  ./build $NODES $VERSION
-  cd ..
+# get version of hadoop or fallback to 2.8.2
+HADOOP_VERSION=${2:-2.8.2}
+
+# get version of spark or fallback to 2.2.0
+SPARK_VERSION=${3:-2.2.0}
+
+# build image with compile option
+COMPILE=false
+
+# get args
+while getopts ":c" opt; do
+  case $opt in
+    a)
+      COMPILE=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+# check if docker hadoop image exists
+if [ "$CURRENT_NODES" == "" ] || \
+   [ "$NODES" != "$CURRENT_NODES" ] || \
+   [ "$(docker images -q $(whoami)/hadoop:$HADOOP_VERSION 2> /dev/null)" == "" ] ; then
+  # create new docker hadoop image
+  echo -e "$(whoami)/hadoop:$HADOOP_VERSION docker image not found!\n"
+  if [ $COMPILE == true ]; then
+      cd hadoop-compile-build
+      ./build.sh $NODES $HADOOP_VERSION
+      cd ..
+  else
+      cd hadoop-build
+      ./build.sh $NODES $HADOOP_VERSION
+      cd ..
+  fi
 fi
 
 # start hadoop master container
@@ -23,7 +55,7 @@ docker run -itd \
                 -p 8088:8088 \
                 --name hadoop-master \
                 --hostname hadoop-master \
-                $(whoami)/hadoop:$VERSION
+                $(whoami)/hadoop:$HADOOP_VERSION
 
 # start hadoop slaves containers
 i=1
@@ -35,12 +67,36 @@ do
 	                --net=hadoop \
 	                --name hadoop-slave$i \
 	                --hostname hadoop-slave$i \
-	                $(whoami)/hadoop:$VERSION
+	                $(whoami)/hadoop:$HADOOP_VERSION
 	i=$(( $i + 1 ))
 done
+
+# check if docker spark image exists
+if [ "$(docker images -q $(whoami)/hadoop-spark:$SPARK_VERSION 2> /dev/null)" == "" ] ; then
+  # create new docker spark image
+  echo -e "$(whoami)/hadoop-spark:$SPARK_VERSION docker image not found!\n"
+  cd spark-build
+  ./build.sh $HADOOP_VERSION $SPARK_VERSION
+  cd ..
+fi
+
+# start spark container
+docker rm -f spark &> /dev/null
+echo "start spark container..."
+docker run -itd \
+                --net=hadoop \
+                --name spark \
+                --hostname spark\
+                $(whoami)/hadoop-spark:$SPARK_VERSION
+
+# update nodes number
+echo $NODES > nodes
 
 # start hadoop inside container
 docker exec -it hadoop-master /root/start-hadoop.sh
 
-# execute computation
-docker exec -it hadoop-master /root/wordcount.sh
+# execute computation mapreduce
+docker exec -it hadoop-master /root/wordcount-mapreduce.sh
+
+# execute computation spark
+docker exec -it spark /root/wordcount.sh

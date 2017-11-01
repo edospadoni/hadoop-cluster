@@ -13,19 +13,37 @@ WORKDIR /root
 RUN apt-get update && \
     apt-get install -y wget \
                        openjdk-8-jdk \
+                       libprotobuf-dev \
+                       protobuf-compiler \
+                       maven \
+                       cmake \
+                       build-essential \
+                       pkg-config \
+                       libssl-dev \
+                       zlib1g-dev \
+                       gcc \
+                       automake \
+                       autoconf \
+                       make \
                        openssh-server
 
-# download hadoop
-RUN wget https://www.apache.org/dist/hadoop/common/hadoop-$VERSION/hadoop-$VERSION.tar.gz
+# download hadoop sources
+RUN wget http://archive.apache.org/dist/hadoop/core/hadoop-$VERSION/hadoop-$VERSION-src.tar.gz
 
 # extract hadoop sources
-RUN tar -xzvf hadoop-$VERSION.tar.gz
+RUN tar -xzvf hadoop-$VERSION-src.tar.gz
+
+# compile hadoop
+RUN cd hadoop-$VERSION-src && \
+    mvn package -Pdist,native -DskipTests -Dtar && \
+    cd .. && \
+    tar -xzvf hadoop-$VERSION-src/hadoop-dist/target/hadoop-$VERSION.tar.gz
 
 # move compiled hadoop to binary directory
 RUN mv hadoop-$VERSION /usr/local/hadoop
 
 # set environment variable
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV PATH=$PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin
 
