@@ -1,4 +1,4 @@
-hadoop-multinode
+hadoop-cluster
 ================
 
 Create a N-nodes Hadoop cluster using docker container
