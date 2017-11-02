@@ -1,6 +1,4 @@
 #!/bin/bash
-# default number of cluster nodes
-NODES=3
 # default version of hadoop
 HADOOP_VERSION=2.8.2
 # default version of spark
