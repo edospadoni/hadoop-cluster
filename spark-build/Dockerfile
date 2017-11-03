@@ -29,9 +29,6 @@ ENV SPARK_HOME=/usr/local/spark
 ENV YARN_CONF_DIR=/usr/local/hadoop/etc/hadoop
 ENV PATH=$PATH:/usr/local/spark/bin
 
-# copy wordcount script
-COPY task/wordcount.sh .
-
 # export ENV variable for spark
 RUN echo "export SPARK_DIST_CLASSPATH=$(hadoop classpath)" >> /usr/local/spark/conf/spark-env.sh
 

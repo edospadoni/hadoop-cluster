@@ -100,7 +100,7 @@ echo "start spark container..."
 docker run -itd \
                 --net=hadoop \
                 --name spark \
-                --hostname spark\
+                --hostname spark \
                 $(whoami)/hadoop-spark:$SPARK_VERSION
 
 # update nodes number
@@ -109,8 +109,4 @@ echo $NODES > nodes
 # start hadoop inside container
 docker exec -it hadoop-master /root/start-hadoop.sh
 
-# execute computation mapreduce
-docker exec -it hadoop-master /root/wordcount-mapreduce.sh
-
-# execute computation spark
-docker exec -it spark /root/wordcount.sh
+echo "hadoop cluster with $NODES nodes started successfully!"

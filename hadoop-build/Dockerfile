@@ -38,9 +38,8 @@ RUN mkdir -p ~/hdfs/namenode && \
     mkdir -p ~/hdfs/datanode && \
     mkdir $HADOOP_HOME/logs
 
-# copy local configurations and tasks to container
+# copy local configurations to container
 COPY config/* /tmp/
-COPY task/* /tmp/
 
 # copy to correct destinations directory
 RUN mv /tmp/ssh-config ~/.ssh/config && \
@@ -50,12 +49,10 @@ RUN mv /tmp/ssh-config ~/.ssh/config && \
     mv /tmp/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml && \
     mv /tmp/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml && \
     mv /tmp/slaves $HADOOP_HOME/etc/hadoop/slaves && \
-    mv /tmp/start-hadoop.sh ~/start-hadoop.sh && \
-    mv /tmp/wordcount.sh ~/wordcount-mapreduce.sh
+    mv /tmp/start-hadoop.sh ~/start-hadoop.sh
 
 # make scripts executable
 RUN chmod +x ~/start-hadoop.sh && \
-    chmod +x ~/wordcount-mapreduce.sh && \
     chmod +x $HADOOP_HOME/sbin/start-dfs.sh && \
     chmod +x $HADOOP_HOME/sbin/start-yarn.sh
 
