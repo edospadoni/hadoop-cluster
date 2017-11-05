@@ -48,7 +48,6 @@ if [ "$CURRENT_NODES" == "" ] || \
    [ "$NODES" != "$CURRENT_NODES" ] || \
    [ "$(docker images -q $(whoami)/hadoop:$HADOOP_VERSION 2> /dev/null)" == "" ] ; then
   # create new docker hadoop image
-  echo -e "$(whoami)/hadoop:$HADOOP_VERSION docker image not found!\n"
   if [ $COMPILE == true ]; then
       cd hadoop-compile-build
       ./build.sh $NODES $HADOOP_VERSION
@@ -62,7 +61,7 @@ fi
 
 # start hadoop master container
 docker rm -f hadoop-master &> /dev/null
-echo "start hadoop-master container..."
+echo "create hadoop-master container..."
 docker run -itd \
                 --net=hadoop \
                 -p 50070:50070 \
@@ -76,7 +75,7 @@ i=1
 while [ $i -lt $NODES ]
 do
 	docker rm -f hadoop-slave$i &> /dev/null
-	echo "start hadoop-slave$i container..."
+	echo "create hadoop-slave$i container..."
 	docker run -itd \
 	                --net=hadoop \
 	                --name hadoop-slave$i \
@@ -88,7 +87,6 @@ done
 # check if docker spark image exists
 if [ "$(docker images -q $(whoami)/hadoop-spark:$SPARK_VERSION 2> /dev/null)" == "" ] ; then
   # create new docker spark image
-  echo -e "$(whoami)/hadoop-spark:$SPARK_VERSION docker image not found!\n"
   cd spark-build
   ./build.sh $HADOOP_VERSION $SPARK_VERSION
   cd ..
@@ -96,7 +94,7 @@ fi
 
 # start spark container
 docker rm -f spark &> /dev/null
-echo "start spark container..."
+echo "create spark container..."
 docker run -itd \
                 --net=hadoop \
                 --name spark \
@@ -107,6 +105,7 @@ docker run -itd \
 echo $NODES > nodes
 
 # start hadoop inside container
-docker exec -it hadoop-master /root/start-hadoop.sh
+echo "start hadoop cluster..."
+docker exec -it hadoop-master /root/start-hadoop.sh > /dev/null
 
 echo "hadoop cluster with $NODES nodes started successfully!"
