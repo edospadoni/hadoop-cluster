@@ -22,6 +22,6 @@ Create a N-nodes Hadoop cluster using docker container
 - COMPILE_HADOOP: default to `false`
 
 ## Execute task for hadoop and spark
-`./exec-task`
+`./exec-task <hadoop | spark>`
 
 Based on [kiwenlau](https://github.com/kiwenlau/hadoop-cluster-docker)
