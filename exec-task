@@ -1,6 +1,19 @@
 #!/bin/bash
-docker cp tasks/wordcount-mapreduce.sh hadoop-master:/root/wordcount-mapreduce.sh
-docker exec -it hadoop-master /root/wordcount-mapreduce.sh
-
-docker cp tasks/wordcount-spark.sh spark:/root/wordcount-spark.sh
-docker exec -it spark /root/wordcount-spark.sh
+usage() {
+    echo "Usage: $0 <hadoop | spark>"
+}
+case "${1}" in
+    hadoop)
+        echo "hadoop task is started..."
+        docker cp tasks/wordcount-mapreduce.sh hadoop-master:/root/wordcount-mapreduce.sh
+        docker exec -it hadoop-master /root/wordcount-mapreduce.sh
+        ;;
+    spark)
+        echo "spark task is started..."
+        docker cp tasks/wordcount-spark.sh spark:/root/wordcount-spark.sh
+        docker exec -it spark /root/wordcount-spark.sh
+        ;;
+    *)
+        usage
+        ;;
+esac
