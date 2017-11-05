@@ -3,6 +3,9 @@ hadoop-cluster
 
 Create a N-nodes Hadoop cluster using docker container
 
+# Requirements
+`docker v17.09 or above`
+
 # Configuration
 ## Create docker network
 `docker network create --driver=bridge hadoop`
